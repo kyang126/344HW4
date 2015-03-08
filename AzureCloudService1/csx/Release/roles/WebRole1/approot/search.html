@@ -12,15 +12,16 @@
         /* This function uses ajax to output the 10 words closest to the search term on keystroke
         */
         $(document).ready(function () {
-
+           document.getElementById('nbaResults').style.display = 'none';
 
             $('#submit').click(function () {
                 var searchTerm = $('.search').val().trim();
 
                 $.getJSON('http://ec2-54-148-205-86.us-west-2.compute.amazonaws.com/search.php?callback=?', 'firstname=' + searchTerm, function (res) {
                     if (res.playername == "") {
-                        $("#nbaResults").html("No Results").show();
+                        document.getElementById('nbaResults').style.display = 'none';
                     } else {
+                        document.getElementById('nbaResults').style.display = 'block';
                         document.getElementById("playerProfile").src = res.img;
                         document.getElementById("playerProfile").innerHTML = "nba player";
                         document.getElementById("playername").innerHTML = res.playername;
@@ -58,9 +59,10 @@
                 });
             });
 
+     
+           
 
-
-            //Records each key stroke of user input
+           //Records each key stroke of user input
             $(".search").keyup(function () {
                 var searchTerm = $(this).val().trim();
                 var w = {
@@ -83,11 +85,11 @@
                         $("#results").html(suggest).show();
                     },
                     error: function (msg) {
-                        alert(JSON.stringify(msg));
+                       // alert(JSON.stringify(msg));
                     }
-                });
+                }); 
 
-            })
+            }) 
         });
     </script>
 
@@ -97,6 +99,7 @@
     <input class="search" type="text" name="lname">
     <input id="submit" type="submit" value="Submit">
     <div id="results"></div>
+    <div id="nbaResults">
     <div class="pure-g searchDiv">
         <div class="pure-u-1-1">
             <img id="playerProfile" src="" onerror="this.onerror=null;this.src='';" height="200" width="200">
@@ -105,7 +108,7 @@
 
 
 
-            <div id="nbaResults"></div>
+            
         </div>
         <div class="pure-g">
             <div class="pure-u-1-5">
@@ -131,6 +134,7 @@
 
         </div>
     </div>
+       </div>
     <div id="searchResults"></div>
 </body>
 </html>

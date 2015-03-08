@@ -10,82 +10,6 @@
         
         $(document).ready(function () {
 
-
-            $("#nbaText").keyup(function () {
-                var searchTerm = $('#nbaText').val().trim();
-                var w = {
-                    term: searchTerm
-                }
-                //If the user has inputted into the text field
-                $.ajax({
-                    type: "POST",
-                    url: "QuerySuggest.asmx/getSuggestions",
-                    data: JSON.stringify(w),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    minLength: 1,
-                    success: function (data) { //Call upon the list that holds all the words that are closest to the term and outputs it
-                        var myData = data.d;
-                        var suggest = "";
-                        for (var i = 0; i < myData.length; i++) {
-                            suggest += myData[i] + "<br/>";
-                        }
-                        alert(suggest);
-                        $("#querySuggest").html(suggest).show();
-                    },
-                    error: function (msg) {
-                       // $("#querySuggest").html("no suggestions").show();
-                    }
-                });
-
-            })
-
-
-            //This function searches index table for the title value based on the url. It will say not found if there is nothing.
-            $('#nbaButton').click(function () {
-                var searchTerm = $('#nbaText').val().trim();
-
-                $.getJSON('http://ec2-54-148-205-86.us-west-2.compute.amazonaws.com/search.php?callback=?', 'firstname=' + searchTerm, function (res) {
-                    if (res.playername == "") {
-                        $("#nbaResults").html("No Results").show();
-                    } else {
-                        document.getElementById("playerProfile").src = res.img;
-                        document.getElementById("playerProfile").innerHTML = "nba player";
-                        document.getElementById("playername").innerHTML = res.playername;
-                        document.getElementById("gp").innerHTML = res.gp;
-                        document.getElementById("fgp").innerHTML = res.fgp;
-                        document.getElementById("tpp").innerHTML = res.tpp;
-                        document.getElementById("ftp").innerHTML = res.ftp;
-                        document.getElementById("ppg").innerHTML = res.ppg;
-                       // $("#nbaResults").html(res.playername + " </br> " + res.gp + " </br>  " + res.fgp + " </br> " + res.tpp + " </br>  " + res.ftp + " </br>  " + res.ppg + " </br>  " +  res.img).show();
-                    }
-                   
-                });
-
-                var w = {
-                    term: searchTerm
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "dashboard.asmx/search",
-                    data: JSON.stringify(w),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function (msg) {
-                        var myData = msg.d;
-                        var suggest = "";
-                        for (var i = 0; i < myData.length; i++) {
-                            suggest += myData[i] + "<br/>";
-                        }
-                        $("#searchResults").html(suggest).show();
-                    },
-                    error: function (msg) {
-                        $("#searchResults").html("Not Found").show();
-                    }
-                });
-            });
-
-
             //User clicks this then the worker role will start crawling
             $(function () {
                 $('#start').click(function () {
@@ -280,50 +204,7 @@
 <body>
     <div class="canvas">
         <h1 class="title">Web Crawler</h1>
-        <div class="pure-g searchDiv">
-            <div class="pure-u-1-1">
-                <input id="nbaText" class="nbaSearch" type="text">
-                <div id="querySuggest"></div>
-                <button id="nbaButton" type="button">Search</button>
-                <h2>NBA Results</h2>
-                <img id="playerProfile" src="" onerror="this.onerror=null;this.src='';" height="200" width="200">
-                
-                <h3 id="playername"></h3>
-                
-               
-                
-                <div id="nbaResults"></div>
-            </div>
-            <div class="pure-g">
-                <div class="pure-u-1-5">
-                    <h3>GP</h3>
-                    <p id="gp"></p>
-                </div>
-                <div class="pure-u-1-5">
-                    <h3>FGP</h3>
-                    <p id="fgp"></p>
-                </div>
-                <div class="pure-u-1-5">
-                    <h3>TPP</h3>
-                    <p id="tpp"></p>
-                </div>
-                <div class="pure-u-1-5">
-                    <h3>FTP</h3>
-                    <p id="ftp"></p>
-                </div>
-                <div class="pure-u-1-5">
-                    <h3>PPG</h3>
-                    <p id="ppg"></p>
-                </div>
-
-            </div>
-        </div>
-        <div class="pure-g searchDiv">
-            <div class="pure-u-1-1">
-                <h2>Search Results</h2>
-                <div id="searchResults"></div>
-            </div>
-        </div>
+       
         <div class="pure-g">
             <div class="pure-u-1-1">
                 <h2>Press here to see data</h2>

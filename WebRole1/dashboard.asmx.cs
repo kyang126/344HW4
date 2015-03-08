@@ -19,6 +19,9 @@ namespace WebRole1
     [System.Web.Script.Services.ScriptService]
     public class dashboard : System.Web.Services.WebService
     {
+    private static Dictionary<String, List<String>> localCache = new
+    Dictionary<String, List<String>>();
+
 
         //Puts the word start to the CloudQueue for the worker to see
         [WebMethod]
@@ -197,45 +200,58 @@ namespace WebRole1
         [WebMethod]
         public List<String> search(String term)
         {
+            List<string> suggestions = new List<string>();
             getReference g = new getReference();
             CloudTable table = g.getTable();
             List<crawledTable> t = new List<crawledTable>();
 
-            List<String> searchWords = new List<String>();
-            
-            string[] words = term.ToLower().Split(' ');
-            foreach (string word in words)
+            if (!localCache.ContainsKey(term))
             {
-                searchWords.Add(word);
-            }
+                List<String> searchWords = new List<String>();
 
-            for (int i = 0; i < searchWords.Count; i++)
-            {
-              TableQuery<crawledTable> rangeQuery = new TableQuery<crawledTable>().Where(
-              TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, searchWords[i]));
-
-                foreach (crawledTable entity in table.ExecuteQuery(rangeQuery))
+                string[] words = term.ToLower().Split(' ');
+                foreach (string word in words)
                 {
-                    t.Add(entity);
+                    searchWords.Add(word);
                 }
+
+                for (int i = 0; i < searchWords.Count; i++)
+                {
+                    TableQuery<crawledTable> rangeQuery = new TableQuery<crawledTable>().Where(
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, searchWords[i]));
+
+                    foreach (crawledTable entity in table.ExecuteQuery(rangeQuery))
+                    {
+                        t.Add(entity);
+                    }
+                }
+                suggestions = tenSearch(t);
+
+                localCache.Add(term, suggestions);
+                return suggestions;
+                      
+            } else
+            {
+                List<string> a = localCache[term];
+                return a; ;
             }
-          
-            return tenSearch(t);
         }
 
         private List<String> tenSearch(List<crawledTable> s)
         {
-            var res = from word in s
-                      group word.url by word.url into g
-                      orderby g.Count() descending
-                      select g;
-            
-            var ten = res.ToList().Take(10);
+
+            var order = s.Select(x=> new Tuple<string, string, string> (x.url, x.title, x.date))
+                .GroupBy(x => x.Item1)
+                .Select(x => new Tuple<string, string, string, int>(x.Key, x.ToList().First().Item2, x.ToList().First().Item3, x.Count()))
+                .OrderByDescending(x=>x.Item4)
+                .ThenByDescending((x=>x.Item3))
+                .Take(10);
+
             List<String> tenList = new List<String>();
 
-            foreach (var nameGroup in ten)
+            foreach (var nameGroup in order)
             {
-                tenList.Add(nameGroup.Key + "<br/>");
+                tenList.Add(nameGroup.Item2 + "<br/>" + nameGroup.Item1 + "<br/>" + nameGroup.Item3 + "<br/>");
             }
             return tenList;
         }

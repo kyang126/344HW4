@@ -86,7 +86,6 @@ namespace WorkerRole1
             //Look through the xml files and go deeper into them if there are multiple layers. The list will grow for every layer of xml files to parse through
             while (count < visitedList.Count)
             {
-
                 //Go into the xml page and grab the url/xml file
                 WebClient web = new WebClient();
                 String html = web.DownloadString(visitedList.ElementAt(count));
@@ -178,7 +177,7 @@ namespace WorkerRole1
                         float memory = this.theMemCounter.NextValue();
                         float cpuUtilization = this.cpuload.NextValue();
 
-                        tableSize++;
+                        tableSize += keyTitles.Count();
                         
                        
                         //Converts the error list to a single string divided by commas
