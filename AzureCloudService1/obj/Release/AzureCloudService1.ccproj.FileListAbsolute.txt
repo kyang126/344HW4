@@ -266,6 +266,7 @@ C:\Users\Kevin\Documents\Test HW 3\AzureCloudService1\obj\Release\WebRole1\dashb
 C:\Users\Kevin\Documents\Test HW 3\AzureCloudService1\obj\Release\WebRole1\index.html
 C:\Users\Kevin\Documents\Test HW 3\AzureCloudService1\obj\Release\WebRole1\packages.config
 C:\Users\Kevin\Documents\Test HW 3\AzureCloudService1\obj\Release\WebRole1\QuerySuggest.asmx
+C:\Users\Kevin\Documents\Test HW 3\AzureCloudService1\obj\Release\WebRole1\search.html
 C:\Users\Kevin\Documents\Test HW 3\AzureCloudService1\obj\Release\WebRole1\styles.css
 C:\Users\Kevin\Documents\Test HW 3\AzureCloudService1\obj\Release\WebRole1\Web.config
 C:\Users\Kevin\Documents\Test HW 3\AzureCloudService1\obj\Release\WorkerRole1\ClassLibrary1.dll

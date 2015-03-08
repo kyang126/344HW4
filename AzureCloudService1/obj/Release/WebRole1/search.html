@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    <script type="text/javascript">
+
+
+
+        /* This function uses ajax to output the 10 words closest to the search term on keystroke
+        */
+        $(document).ready(function () {
+
+
+            $('#submit').click(function () {
+                var searchTerm = $('.search').val().trim();
+
+                $.getJSON('http://ec2-54-148-205-86.us-west-2.compute.amazonaws.com/search.php?callback=?', 'firstname=' + searchTerm, function (res) {
+                    if (res.playername == "") {
+                        $("#nbaResults").html("No Results").show();
+                    } else {
+                        document.getElementById("playerProfile").src = res.img;
+                        document.getElementById("playerProfile").innerHTML = "nba player";
+                        document.getElementById("playername").innerHTML = res.playername;
+                        document.getElementById("gp").innerHTML = res.gp;
+                        document.getElementById("fgp").innerHTML = res.fgp;
+                        document.getElementById("tpp").innerHTML = res.tpp;
+                        document.getElementById("ftp").innerHTML = res.ftp;
+                        document.getElementById("ppg").innerHTML = res.ppg;
+                        // $("#nbaResults").html(res.playername + " </br> " + res.gp + " </br>  " + res.fgp + " </br> " + res.tpp + " </br>  " + res.ftp + " </br>  " + res.ppg + " </br>  " +  res.img).show();
+                    }
+
+                });
+
+                var w = {
+                    term: searchTerm
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "dashboard.asmx/search",
+                    data: JSON.stringify(w),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (msg) {
+                        var myData = msg.d;
+                        var suggest = "";
+                        for (var i = 0; i < myData.length; i++) {
+                            suggest += myData[i] + "<br/>";
+                        }
+
+                        $("#searchResults").html(suggest).show();
+                    },
+                    error: function (msg) {
+                        $("#searchResults").html("Not Found").show();
+                    }
+                });
+            });
+
+
+
+            //Records each key stroke of user input
+            $(".search").keyup(function () {
+                var searchTerm = $(this).val().trim();
+                var w = {
+                    term: searchTerm
+                }
+                //If the user has inputted into the text field
+                $.ajax({
+                    type: "POST",
+                    url: "QuerySuggest.asmx/getSuggestions",
+                    data: JSON.stringify(w),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    minLength: 1,
+                    success: function (data) { //Call upon the list that holds all the words that are closest to the term and outputs it
+                        var myData = data.d;
+                        var suggest = "";
+                        for (var i = 0; i < myData.length; i++) {
+                            suggest += myData[i] + "<br/>";
+                        }
+                        $("#results").html(suggest).show();
+                    },
+                    error: function (msg) {
+                        alert(JSON.stringify(msg));
+                    }
+                });
+
+            })
+        });
+    </script>
+
+</head>
+<body>
+    <h1>HW 4</h1>
+    <input class="search" type="text" name="lname">
+    <input id="submit" type="submit" value="Submit">
+    <div id="results"></div>
+    <div class="pure-g searchDiv">
+        <div class="pure-u-1-1">
+            <img id="playerProfile" src="" onerror="this.onerror=null;this.src='';" height="200" width="200">
+
+            <h3 id="playername"></h3>
+
+
+
+            <div id="nbaResults"></div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <h3>GP</h3>
+                <p id="gp"></p>
+            </div>
+            <div class="pure-u-1-5">
+                <h3>FGP</h3>
+                <p id="fgp"></p>
+            </div>
+            <div class="pure-u-1-5">
+                <h3>TPP</h3>
+                <p id="tpp"></p>
+            </div>
+            <div class="pure-u-1-5">
+                <h3>FTP</h3>
+                <p id="ftp"></p>
+            </div>
+            <div class="pure-u-1-5">
+                <h3>PPG</h3>
+                <p id="ppg"></p>
+            </div>
+
+        </div>
+    </div>
+    <div id="searchResults"></div>
+</body>
+</html>
