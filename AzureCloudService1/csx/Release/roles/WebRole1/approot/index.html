@@ -1,0 +1,395 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Web Crawler</title>
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript">
+        
+        
+        $(document).ready(function () {
+
+
+            $("#nbaText").keyup(function () {
+                var searchTerm = $('#nbaText').val().trim();
+                var w = {
+                    term: searchTerm
+                }
+                //If the user has inputted into the text field
+                $.ajax({
+                    type: "POST",
+                    url: "QuerySuggest.asmx/getSuggestions",
+                    data: JSON.stringify(w),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    minLength: 1,
+                    success: function (data) { //Call upon the list that holds all the words that are closest to the term and outputs it
+                        var myData = data.d;
+                        var suggest = "";
+                        for (var i = 0; i < myData.length; i++) {
+                            suggest += myData[i] + "<br/>";
+                        }
+                        alert(suggest);
+                        $("#querySuggest").html(suggest).show();
+                    },
+                    error: function (msg) {
+                       // $("#querySuggest").html("no suggestions").show();
+                    }
+                });
+
+            })
+
+
+            //This function searches index table for the title value based on the url. It will say not found if there is nothing.
+            $('#nbaButton').click(function () {
+                var searchTerm = $('#nbaText').val().trim();
+
+                $.getJSON('http://ec2-54-148-205-86.us-west-2.compute.amazonaws.com/search.php?callback=?', 'firstname=' + searchTerm, function (res) {
+                    if (res.playername == "") {
+                        $("#nbaResults").html("No Results").show();
+                    } else {
+                        document.getElementById("playerProfile").src = res.img;
+                        document.getElementById("playerProfile").innerHTML = "nba player";
+                        document.getElementById("playername").innerHTML = res.playername;
+                        document.getElementById("gp").innerHTML = res.gp;
+                        document.getElementById("fgp").innerHTML = res.fgp;
+                        document.getElementById("tpp").innerHTML = res.tpp;
+                        document.getElementById("ftp").innerHTML = res.ftp;
+                        document.getElementById("ppg").innerHTML = res.ppg;
+                       // $("#nbaResults").html(res.playername + " </br> " + res.gp + " </br>  " + res.fgp + " </br> " + res.tpp + " </br>  " + res.ftp + " </br>  " + res.ppg + " </br>  " +  res.img).show();
+                    }
+                   
+                });
+
+                var w = {
+                    term: searchTerm
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "dashboard.asmx/search",
+                    data: JSON.stringify(w),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (msg) {
+                        var myData = msg.d;
+                        var suggest = "";
+                        for (var i = 0; i < myData.length; i++) {
+                            suggest += myData[i] + "<br/>";
+                        }
+                        $("#searchResults").html(suggest).show();
+                    },
+                    error: function (msg) {
+                        $("#searchResults").html("Not Found").show();
+                    }
+                });
+            });
+
+
+            //User clicks this then the worker role will start crawling
+            $(function () {
+                $('#start').click(function () {
+                    $.ajax({
+
+                        type: "POST",
+                        url: "dashboard.asmx/startCrawl",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                          //  $("#results").html(msg.d).show();
+                        }
+                    });
+                });
+
+            });
+
+            //When the user clicks stop, this tells the worker to stop parsing
+            $(function () {
+                $('#stop').click(function () {
+                    $.ajax({
+
+                        type: "POST",
+                        url: "dashboard.asmx/stopCrawl",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                        }
+                    });
+                });
+            });
+
+            //When user clicks this button, it displays all the dashboard data
+            $(function () {
+
+                //Grabs queue size and displays it
+                $('#dataButton').click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/getQueueCount",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            $("#results").html(msg.d).show();
+                        }
+                    });
+
+                    //Grabs index size and displays it
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/tableSize",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            $("#tableResults").html(msg.d).show();
+                        }
+                    });
+
+                    //Grabs the status of the worker role and displays it
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/titleSize",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            $("#titleNumber").html(msg.d).show();
+                        }
+                    });
+
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/lastTitle",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            $("#lastTitle").html(msg.d).show();
+                        }
+                    });
+
+                    //Grabs cpu value and displays it
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/cpuSize",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            $("#cpuResults").html(msg.d).show();
+                        }
+                    });
+
+                    //Grabs ram size and displays it
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/ramSize",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            $("#ramResults").html(msg.d).show();
+                        }
+                    });
+
+                    //Grabs the status of the worker role and displays it
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/getStatus",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            $("#statusResults").html(msg.d).show();
+                        }
+                    });
+
+                    //Grabs the last ten urls and displays it
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/lastten",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            var myData = msg.d;
+                            var suggest = "";
+                            for (var i = 0; i < myData.length; i++) {
+                                suggest += myData[i] + "<br/>";
+                            }
+                            $("#tenResults").html(suggest).show();
+                        }
+                    });
+
+                    //Grabs the list of errors and displays it
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/errors",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            var myData = msg.d;
+                            var suggest = "";
+                            for (var i = 0; i < myData.length; i++) {
+                                suggest += myData[i] + "<br/>";
+                            }
+                            $("#errorResults").html(suggest).show();
+                        }
+                    });
+
+
+                });
+            });
+
+            //Clears the queue
+            $(function () {
+                $('#clearQueue').click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/clearQ",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                        }
+                    });
+                });
+            });
+
+            //Clears the Index
+            $(function () {
+                $('#clearTable').click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/deleteTable",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="canvas">
+        <h1 class="title">Web Crawler</h1>
+        <div class="pure-g searchDiv">
+            <div class="pure-u-1-1">
+                <input id="nbaText" class="nbaSearch" type="text">
+                <div id="querySuggest"></div>
+                <button id="nbaButton" type="button">Search</button>
+                <h2>NBA Results</h2>
+                <img id="playerProfile" src="" onerror="this.onerror=null;this.src='';" height="200" width="200">
+                
+                <h3 id="playername"></h3>
+                
+               
+                
+                <div id="nbaResults"></div>
+            </div>
+            <div class="pure-g">
+                <div class="pure-u-1-5">
+                    <h3>GP</h3>
+                    <p id="gp"></p>
+                </div>
+                <div class="pure-u-1-5">
+                    <h3>FGP</h3>
+                    <p id="fgp"></p>
+                </div>
+                <div class="pure-u-1-5">
+                    <h3>TPP</h3>
+                    <p id="tpp"></p>
+                </div>
+                <div class="pure-u-1-5">
+                    <h3>FTP</h3>
+                    <p id="ftp"></p>
+                </div>
+                <div class="pure-u-1-5">
+                    <h3>PPG</h3>
+                    <p id="ppg"></p>
+                </div>
+
+            </div>
+        </div>
+        <div class="pure-g searchDiv">
+            <div class="pure-u-1-1">
+                <h2>Search Results</h2>
+                <div id="searchResults"></div>
+            </div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-1">
+                <h2>Press here to see data</h2>
+                <button id="dataButton" type="button" onclick="startFunction()">See Data</button><br />
+            </div>
+       </div>
+        <div class="pure-g">
+            <div class="pure-u-1-2">
+                <h2>Last Title</h2>
+                <div id="lastTitle"></div>
+            </div>
+            <div class="pure-u-1-2">
+                <h2>Title Number</h2>
+                <div id="titleNumber"></div>
+            </div>
+
+        </div>
+
+            <div class="pure-g">
+                <div class="pure-u-1-4">
+                    <button id="start" type="button" onclick="startFunction()">Start</button><br />
+                </div>
+                <div class="pure-u-1-4">
+                    <button id="stop" type="button" onclick="stopFunction()">Stop</button><br />
+                </div>
+                <div class="pure-u-1-4">
+                    <button id="clearQueue" type="button" onclick="queueFunction()">Clear Queue</button><br />
+                </div>
+                <div class="pure-u-1-4">
+                    <button id="clearTable" type="button" onclick="tableFunction()">Clear Index</button><br />
+                </div>
+
+            </div>
+            <div class="pure-g">
+                <div class="pure-u-1-4">
+                    <h2>Queue Size</h2>
+                    <div id="results"></div>
+                </div>
+                <div class="pure-u-1-4">
+                    <h2>Index Size</h2>
+                    <div id="tableResults"></div>
+                </div>
+                <div class="pure-u-1-4">
+                    <h2>CPU Utilization</h2>
+                    <div id="cpuResults"></div>
+                </div>
+                <div class="pure-u-1-4">
+                    <h2>Ram Available</h2>
+                    <div id="ramResults"></div>
+                </div>
+
+            </div>
+            <div class="pure-g">
+                <div class="pure-u-1-3">
+                    <h2>Last 10 Urls Crawled</h2>
+                    <div id="tenResults"></div>
+                </div>
+                <div class="pure-u-1-3">
+                    <h2>Last 10 Errors</h2>
+                    <div id="errorResults"></div>
+                </div>
+                <div class="pure-u-1-3">
+                    <h2>Status of Crawler</h2>
+                    <div id="statusResults"></div>
+                </div>
+            </div>
+        </div>
+</body>
+</html>
