@@ -90,7 +90,7 @@ namespace WebRole1
                         break;
                     }
                 }
-                crawledTable dashboard = new crawledTable("query", null, null, null, null, null, "querykey", 0, null, null, "idle", "" +titleCounter,line);
+                crawledTable dashboard = new crawledTable("query", null, null, null, null, null, "querykey", 0, null, null, "idle", "" +titleCounter,line, 0);
                 TableOperation insertOrReplaceOperation1 = TableOperation.InsertOrReplace(dashboard);
                 table.Execute(insertOrReplaceOperation1);
                 return lastTitle;
@@ -103,6 +103,6 @@ namespace WebRole1
         {
             //Returns list of words that closely matches the search term
             return bt.search(term);
-        }
+        } 
     }
 }

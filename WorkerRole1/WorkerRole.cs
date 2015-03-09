@@ -49,7 +49,7 @@ namespace WorkerRole1
                     CloudQueueMessage retrievedMessage = cmd.GetMessage();
 
                     //Let the user know about the status of the worker
-                    crawledTable dashboard = new crawledTable("dash", null, null, null, null, null, "rowkey", 0, null, null, "idle", null, null);
+                    crawledTable dashboard = new crawledTable("dash", null, null, null, null, null, "rowkey", 0, null, null, "idle", null, null, 0);
                     TableOperation insertOrReplaceOperation1 = TableOperation.InsertOrReplace(dashboard);
                     table.Execute(insertOrReplaceOperation1);
 
@@ -111,7 +111,7 @@ namespace WorkerRole1
                         htmlList.Add(url);
                     }
                 }
-                crawledTable dashboard = new crawledTable("dash", null, null, null, null, null, "rowkey", 0, null, null, "loading", null, null);
+                crawledTable dashboard = new crawledTable("dash", null, null, null, null, null, "rowkey", 0, null, null, "loading", null, null, 0);
                 TableOperation insertOrReplaceOperation1 = TableOperation.InsertOrReplace(dashboard);
                 table.Execute(insertOrReplaceOperation1);
                 count++;
@@ -133,6 +133,7 @@ namespace WorkerRole1
             queue.FetchAttributes();
             var limitCount = queue.ApproximateMessageCount.Value;
             int tableSize = 0;
+            int urlSize = 0;
 
             //While the CloudQueue that holds the links that have yet to be visited isn't empty, this will parse through every link
             while (0 < limitCount)
@@ -167,8 +168,6 @@ namespace WorkerRole1
                             tenUrls = String.Join(",", lastten);
                         }
 
-                        //Delete the url since already visited now
-                        queue.DeleteMessage(retrievedMessage);
 
                         //Encode the url to enable it to be placed as a rowkey
                         String encodeUrl = EncodeUrlInKey(retrievedMessage.AsString);
@@ -178,13 +177,13 @@ namespace WorkerRole1
                         float cpuUtilization = this.cpuload.NextValue();
 
                         tableSize += keyTitles.Count();
-                        
+                        urlSize++; 
                        
                         //Converts the error list to a single string divided by commas
                         String errors = String.Join(",", errorList);
 
                         //Insert the data into the cloudtable
-                        insertTable(table, retrievedMessage.AsString, title, date, errors, tenUrls, tableSize, memory.ToString(), cpuUtilization.ToString(), encodeUrl, keyTitles);
+                        insertTable(table, retrievedMessage.AsString, title, date, errors, tenUrls, tableSize, memory.ToString(), cpuUtilization.ToString(), encodeUrl, keyTitles, urlSize);
                         
                         //get the root of the url that is being parsed
                         string root = crawlWeb.getRoot(retrievedMessage.AsString);
@@ -232,6 +231,9 @@ namespace WorkerRole1
                     }
 
                 }
+
+                //Delete the url since already visited now
+                queue.DeleteMessage(retrievedMessage);
                 queue.FetchAttributes();
                 limitCount = queue.ApproximateMessageCount.Value;
             }
@@ -239,18 +241,18 @@ namespace WorkerRole1
 
         //The table takes in the fields CloudTable, url, title, date, errors, tenUrls, tableSize, memory, cpu, encodeUrl
         //Puts in the values into table
-        private void insertTable(CloudTable table, string url, string title, string date, string errors, string tenUrls, int tableSize, string memory, string cpuUtilization, string encodeUrl, List<String> keyTitles)
+        private void insertTable(CloudTable table, string url, string title, string date, string errors, string tenUrls, int tableSize, string memory, string cpuUtilization, string encodeUrl, List<String> keyTitles, int urlSize)
         {
             for (int i = 0; i < keyTitles.Count; i++)
             {
                 if (!keyTitles[i].Equals(""))
                 {
-                    crawledTable ct = new crawledTable(keyTitles[i], url, title, date, null, null, encodeUrl, 0, null, null, null, null, null);
+                    crawledTable ct = new crawledTable(keyTitles[i], url, title, date, null, null, encodeUrl, 0, null, null, null, null, null, urlSize);
                     TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(ct);
                     table.ExecuteAsync(insertOrReplaceOperation);
                 }   
             }           
-            crawledTable dashboard = new crawledTable("dash", url, title, date, errors, tenUrls, "rowkey", tableSize, memory, cpuUtilization + "%", "crawling", null, null);
+            crawledTable dashboard = new crawledTable("dash", url, title, date, errors, tenUrls, "rowkey", tableSize, memory, cpuUtilization + "%", "crawling", null, null, urlSize);
             TableOperation insertOrReplaceOperation1 = TableOperation.InsertOrReplace(dashboard);
        
             table.ExecuteAsync(insertOrReplaceOperation1);

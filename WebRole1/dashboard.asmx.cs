@@ -102,6 +102,19 @@ namespace WebRole1
             return value;
         }
 
+        //Gets the index size
+        [WebMethod]
+        public int urlSize()
+        {
+            getReference g = new getReference();
+            CloudTable table = g.getTable();
+            TableOperation retrieveOperation = TableOperation.Retrieve<crawledTable>("dash", "rowkey");
+            // Execute the retrieve operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
+            int value = ((crawledTable)retrievedResult.Result).urlSize;
+            return value;
+        }
+
         //Gets the ram size
         [WebMethod]
         public string ramSize()
@@ -251,7 +264,7 @@ namespace WebRole1
 
             foreach (var nameGroup in order)
             {
-                tenList.Add(nameGroup.Item2 + "<br/>" + nameGroup.Item1 + "<br/>" + nameGroup.Item3 + "<br/>");
+                tenList.Add("<h3>"+nameGroup.Item2 + "</h3>" + nameGroup.Item1 + "<br/>" + nameGroup.Item3 + "<br/>");
             }
             return tenList;
         }

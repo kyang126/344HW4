@@ -4,10 +4,22 @@
 <head>
     <title></title>
     <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+
     <script type="text/javascript">
+    (function () {
+        if (window.CHITIKA === undefined) { window.CHITIKA = { 'units': [] }; };
+        var unit = { "calltype": "async[2]", "publisher": "kyang126", "width": 550, "height": 250, "sid": "Chitika Default" };
+        var placement_id = window.CHITIKA.units.length;
+        window.CHITIKA.units.push(unit);
+        document.write('<div id="chitikaAdBlock-' + placement_id + '"></div>');
+    }());
+    </script>
+    <script type="text/javascript" src="//cdn.chitika.net/getads.js" async></script>
 
-
+    <script type="text/javascript">
 
         /* This function uses ajax to output the 10 words closest to the search term on keystroke
         */
@@ -92,49 +104,59 @@
             }) 
         });
     </script>
-
 </head>
 <body>
-    <h1>HW 4</h1>
-    <input class="search" type="text" name="lname">
-    <input id="submit" type="submit" value="Submit">
-    <div id="results"></div>
-    <div id="nbaResults">
-    <div class="pure-g searchDiv">
-        <div class="pure-u-1-1">
-            <img id="playerProfile" src="" onerror="this.onerror=null;this.src='';" height="200" width="200">
-
-            <h3 id="playername"></h3>
-
-
-
-            
+    <div class="overallCanvas">
+        <div class="searchCanvas">
+            <div class="searchBar">
+                <h1>Search</h1>
+                <input class="search" type="text" name="lname">
+                <div id="results"></div>
+                <button class="btn btn-primary" id="submit" type="button" value="Submit"> Search!</button>
+             </div>
         </div>
-        <div class="pure-g">
-            <div class="pure-u-1-5">
-                <h3>GP</h3>
-                <p id="gp"></p>
-            </div>
-            <div class="pure-u-1-5">
-                <h3>FGP</h3>
-                <p id="fgp"></p>
-            </div>
-            <div class="pure-u-1-5">
-                <h3>TPP</h3>
-                <p id="tpp"></p>
-            </div>
-            <div class="pure-u-1-5">
-                <h3>FTP</h3>
-                <p id="ftp"></p>
-            </div>
-            <div class="pure-u-1-5">
-                <h3>PPG</h3>
-                <p id="ppg"></p>
-            </div>
+        <div class="resultsCanvas">
+            <h3>Search Results</h3>
+        
+            <div id="nbaResults">
+                <div class="row searchDiv">
+                    <div class=".col-xs-9">
 
+                        <table class="table">
+                            <caption>Nba Table</caption>
+                            <thead>
+                                <tr>
+                                    <th>Picture</th>
+                                    <th>Name</th>
+                                    <th>GP</th>
+                                    <th>FGP</th>
+                                    <th>TPP</th>
+                                    <th>FTP</th>
+                                    <th>PPG</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><img id="playerProfile" src="" onerror="this.onerror=null;this.src='';" height="200" width="200"></td>
+                                    <td><h3 id="playername"></h3></td>
+                                    <td><p id="gp"></p></td>
+                                    <td><p id="fgp"></p></td>
+                                    <td><p id="tpp"></p></td>
+                                    <td><p id="ftp"></p></td>
+                                    <td><p id="ppg"></p></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                   
+                   
+                    </div>
+           
+               
+                </div>
+            </div>
+            <div id="searchResults"></div>
         </div>
-    </div>
-       </div>
-    <div id="searchResults"></div>
+        </div>
 </body>
 </html>

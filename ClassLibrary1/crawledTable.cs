@@ -15,7 +15,7 @@ namespace ClassLibrary1
     {
         //Takes in the url, title, date, error, lastten, tableSize, ram, cpu, status of worker to display on the dashboard
         public crawledTable(string value, string url, string title, string date, string error, string lastten, string rowkey, int tableSize, 
-            string ram, string cpu, string status, string titleNumber, string lastTitle)
+            string ram, string cpu, string status, string titleNumber, string lastTitle, int urlSize)
         {
             this.PartitionKey = value;
             this.RowKey = rowkey;
@@ -29,12 +29,15 @@ namespace ClassLibrary1
             this.cpu = cpu;
             this.status = status;
             this.titleNumber = titleNumber;
+            this.urlSize = urlSize;
             this.lastTitle = lastTitle;
         }
 
         public crawledTable() { }
 
         public int tableSize { get; set; }
+
+        public int urlSize { get; set; }
 
         public string status { get; set; }
 
