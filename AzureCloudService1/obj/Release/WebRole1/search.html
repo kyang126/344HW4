@@ -8,16 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
 
-    <script type="text/javascript">
-    (function () {
-        if (window.CHITIKA === undefined) { window.CHITIKA = { 'units': [] }; };
-        var unit = { "calltype": "async[2]", "publisher": "kyang126", "width": 550, "height": 250, "sid": "Chitika Default" };
-        var placement_id = window.CHITIKA.units.length;
-        window.CHITIKA.units.push(unit);
-        document.write('<div id="chitikaAdBlock-' + placement_id + '"></div>');
-    }());
-    </script>
-    <script type="text/javascript" src="//cdn.chitika.net/getads.js" async></script>
+ 
 
     <script type="text/javascript">
 
@@ -72,6 +63,22 @@
             });
 
      
+            //User clicks this then the worker role will start crawling
+            $(function () {
+                $('#cache').click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "dashboard.asmx/clearCache",
+                        data: "{}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            //  $("#results").html(msg.d).show();
+                        }
+                    });
+                });
+
+            });
            
 
            //Records each key stroke of user input
@@ -113,6 +120,7 @@
                 <input class="search" type="text" name="lname">
                 <div id="results"></div>
                 <button class="btn btn-primary" id="submit" type="button" value="Submit"> Search!</button>
+                <button class="btn btn-warning" id="cache" type="button" value="Submit"> Clear Cache!</button>
              </div>
         </div>
         <div class="resultsCanvas">
@@ -158,5 +166,16 @@
             <div id="searchResults"></div>
         </div>
         </div>
+       <script type="text/javascript">
+    (function () {
+        if (window.CHITIKA === undefined) { window.CHITIKA = { 'units': [] }; };
+        var unit = { "calltype": "async[2]", "publisher": "kyang126", "width": 550, "height": 250, "sid": "Chitika Default" };
+        var placement_id = window.CHITIKA.units.length;
+        window.CHITIKA.units.push(unit);
+        document.write('<div id="chitikaAdBlock-' + placement_id + '"></div>');
+    }());
+    </script>
+    <script type="text/javascript" src="//cdn.chitika.net/getads.js" async></script>
 </body>
+
 </html>

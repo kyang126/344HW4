@@ -35,6 +35,7 @@ namespace ClassLibrary1
 
         public crawledTable() { }
 
+
         public int tableSize { get; set; }
 
         public int urlSize { get; set; }

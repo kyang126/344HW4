@@ -128,6 +128,7 @@ namespace WebRole1
             return value;
         }
 
+        //Grabbed the number of titles inserted into the trie
         [WebMethod]
         public string titleSize()
         {
@@ -140,6 +141,7 @@ namespace WebRole1
             return value;
         }
 
+        //Grabbing the last title inserted into the trie
         [WebMethod]
         public string lastTitle()
         {
@@ -209,6 +211,13 @@ namespace WebRole1
             return value;
         }
 
+        //Allows user to clear the cache
+        [WebMethod]
+        public void clearCache()
+        {
+            localCache.Clear();
+        }
+
         //Searches the index for the title based on the url inputed
         [WebMethod]
         public List<String> search(String term)
@@ -217,7 +226,7 @@ namespace WebRole1
             getReference g = new getReference();
             CloudTable table = g.getTable();
             List<crawledTable> t = new List<crawledTable>();
-
+            term = term.ToLower();
             if (!localCache.ContainsKey(term))
             {
                 List<String> searchWords = new List<String>();
@@ -250,6 +259,7 @@ namespace WebRole1
             }
         }
 
+        //Get the ten results ordered by count and date
         private List<String> tenSearch(List<crawledTable> s)
         {
 

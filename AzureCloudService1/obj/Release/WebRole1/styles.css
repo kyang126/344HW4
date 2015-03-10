@@ -34,7 +34,7 @@ body {
      color:white;
 }
 
-.searchResults{
+.searchResults, #titleNumber, #lastTitle{
     text-align:center;
 }
 

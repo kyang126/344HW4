@@ -43,15 +43,26 @@ namespace WorkerRole1
                 getReference g = new getReference();
                 CloudQueue cmd = g.commandQueue();
                 CloudTable table = g.getTable();
+                //Let the user know about the status of the worker
+                crawledTable dashboard = new crawledTable("dash", null, null, null, null, null, "rowkey", 0, null, null, "idle", null, null, 0);
+                TableOperation insertOrReplaceOperation1 = TableOperation.InsertOrReplace(dashboard);
+                table.Execute(insertOrReplaceOperation1);
+               
                 while (true)
                 {
                     //Check if the user has submitted the button
                     CloudQueueMessage retrievedMessage = cmd.GetMessage();
 
-                    //Let the user know about the status of the worker
-                    crawledTable dashboard = new crawledTable("dash", null, null, null, null, null, "rowkey", 0, null, null, "idle", null, null, 0);
-                    TableOperation insertOrReplaceOperation1 = TableOperation.InsertOrReplace(dashboard);
-                    table.Execute(insertOrReplaceOperation1);
+                    // Execute the retrieve operation.
+                    TableOperation retrieveOperation = TableOperation.Retrieve<crawledTable>("dash", "rowkey");
+                    TableResult retrievedResult = table.Execute(retrieveOperation);
+                    crawledTable dash = (crawledTable)retrievedResult.Result;
+                    dash.PartitionKey = "dash";
+                    dash.RowKey = "rowkey";
+                    dash.status = "idle";
+                    TableOperation insertOrReplaceOperation2 = TableOperation.InsertOrReplace(dash);
+                    table.Execute(insertOrReplaceOperation2);
+
 
                     //If the user pressed the button start crawling the pages
                     if (retrievedMessage != null && retrievedMessage.AsString.Equals("start"))
@@ -59,7 +70,7 @@ namespace WorkerRole1
                         cmd.DeleteMessage(retrievedMessage);
                         crawler crawlWeb = new crawler();
                         List<String> allowedList = crawlWeb.parseXml();
-                        HashSet<String> visitedList = getAllHtml(allowedList);             
+                        HashSet<String> visitedList = getAllHtml(allowedList);
                         crawlerUrls(visitedList, crawlWeb);
                     }
                     Thread.Sleep(20);
@@ -106,6 +117,10 @@ namespace WorkerRole1
                     //The filter checks if it is an html file and adds it to the CloudQueue and visited list. Also lets the user know that it is in the loading phase.
                     if (!url.Contains("xml"))
                     {
+                        if (url.Contains("www."))
+                        {
+                            url = url.Replace("www.", "");
+                        }
                         CloudQueueMessage message = new CloudQueueMessage(url);
                         queue.AddMessageAsync(message);
                         htmlList.Add(url);

@@ -79,6 +79,10 @@ namespace ClassLibrary1
         //Get the url and the root and append the two
         public string refineUrl(string url, string root)
         {
+            if (url.Contains("www."))
+            {
+                url.Replace("www.", "");
+            }
             if (url.StartsWith("//"))
             {
                 url = "http:" + url;
@@ -118,6 +122,7 @@ namespace ClassLibrary1
             return title;
         }
 
+        //Cleans the key words in the titles and puts it into a list
         public List<String> keyTitles(String title)
         {
             List<String> t = new List<String>();
